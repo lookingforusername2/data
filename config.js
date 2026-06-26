@@ -16,8 +16,8 @@
  */
 
 window.SITE_CONFIG = {
-  gh_owner:  'your-github-username',   // نام کاربری GitHub
-  gh_repo:   'my-site-data',           // نام ریپازیتوری
+  gh_owner:  'lookingforusername2',   // نام کاربری GitHub
+  gh_repo:   'data',           // نام ریپازیتوری
   gh_branch: 'main',                   // معمولاً main یا master
 };
 
