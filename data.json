@@ -37,6 +37,13 @@
       "caption": "Sea",
       "emoji": "📷",
       "bg": "linear-gradient(135deg,#161616,#222)"
+    },
+    {
+      "id": "1782473045425",
+      "file": "images/34278.jpg",
+      "caption": "View",
+      "emoji": "📷",
+      "bg": "linear-gradient(135deg,#161616,#222)"
     }
   ],
   "posts": [
