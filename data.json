@@ -23,17 +23,61 @@
     }
   },
   "music": [],
-  "gallery": [],
+  "gallery": [
+    {
+      "id": "1782467639210",
+      "file": "images/30817.jpg",
+      "caption": "Sea",
+      "emoji": "📷",
+      "bg": "linear-gradient(135deg,#161616,#222)"
+    }
+  ],
   "posts": [
-    { "id": "1", "date": "June 2025", "title": "On listening to music alone at night", "excerpt": "There's something about 2am and headphones that makes every song feel like it was written just for you.", "url": "#" },
-    { "id": "2", "date": "April 2025", "title": "Why I stopped trying to optimize everything", "excerpt": "I used to think more efficiency meant more life. I'm not sure that's true anymore.", "url": "#" }
+    {
+      "id": "1",
+      "date": "June 2025",
+      "title": "On listening to music alone at night",
+      "excerpt": "There's something about 2am and headphones that makes every song feel like it was written just for you.",
+      "url": "#"
+    },
+    {
+      "id": "2",
+      "date": "April 2025",
+      "title": "Why I stopped trying to optimize everything",
+      "excerpt": "I used to think more efficiency meant more life. I'm not sure that's true anymore.",
+      "url": "#"
+    }
   ],
   "interests": [
-    { "icon": "🎵", "title": "Music",          "desc": "From Bon Iver to Beethoven. I listen to music the way others breathe — constantly and without thinking about it too much." },
-    { "icon": "📖", "title": "Reading",         "desc": "Books that change how you look at things. Fiction, philosophy, the occasional biography." },
-    { "icon": "💻", "title": "Building things", "desc": "Code is my medium. I love building tools that solve real problems — apps, utilities, experiments." },
-    { "icon": "📷", "title": "Photography",     "desc": "Mostly with my phone. I'm drawn to light, texture, and small moments that pass too quickly." },
-    { "icon": "🎮", "title": "Gaming",          "desc": "A Minecraft veteran. I appreciate games that reward curiosity and let you build on your own terms." },
-    { "icon": "🌿", "title": "Slow living",     "desc": "Long walks, quiet mornings, tea that's always too hot. The best moments arrive when you stop forcing them." }
+    {
+      "icon": "🎵",
+      "title": "Music",
+      "desc": "From Bon Iver to Beethoven. I listen to music the way others breathe — constantly and without thinking about it too much."
+    },
+    {
+      "icon": "📖",
+      "title": "Reading",
+      "desc": "Books that change how you look at things. Fiction, philosophy, the occasional biography."
+    },
+    {
+      "icon": "💻",
+      "title": "Building things",
+      "desc": "Code is my medium. I love building tools that solve real problems — apps, utilities, experiments."
+    },
+    {
+      "icon": "📷",
+      "title": "Photography",
+      "desc": "Mostly with my phone. I'm drawn to light, texture, and small moments that pass too quickly."
+    },
+    {
+      "icon": "🎮",
+      "title": "Gaming",
+      "desc": "A Minecraft veteran. I appreciate games that reward curiosity and let you build on your own terms."
+    },
+    {
+      "icon": "🌿",
+      "title": "Slow living",
+      "desc": "Long walks, quiet mornings, tea that's always too hot. The best moments arrive when you stop forcing them."
+    }
   ]
 }
