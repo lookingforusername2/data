@@ -9,12 +9,19 @@
     "bio": "A curious person who loves music, slow mornings, and building things.",
     "about_p1": "I'm a curious and creative person living somewhere between music, technology, and long afternoon walks. I find beauty in the details — a melody that feels like it was made just for you, or a book that changes how you see things.",
     "about_p2": "By day I build things with code. By night I listen to music, read, take photos of whatever catches my eye, and write when something feels worth putting into words.",
-    "photo": "",
-    "now_playing": {
-      "track": "Fratres",
-      "artist": "Arvo Pärt",
-      "spinning": true
-    },
+    "photo": "images/34295.jpg",
+    "now_playing": [
+      {
+        "track": "Fratres",
+        "artist": "Arvo Pärt",
+        "spinning": true
+      },
+      {
+        "track": "Infra",
+        "artist": "Max Richter",
+        "spinning": false
+      }
+    ],
     "social": {
       "email": "",
       "github": "",
