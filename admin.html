@@ -108,6 +108,16 @@ code{font-size:.77rem;background:var(--bg2);padding:1px 6px;border-radius:4px;bo
 .iab:hover{color:var(--t);background:var(--br)}
 .iab.del:hover{color:var(--red);background:rgba(200,100,100,.09)}
 
+/* ── NOW PLAYING LIST (MINI) ── */
+.np-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.np-row{display:flex;gap:8px;align-items:center;background:var(--bg);padding:8px;border-radius:var(--r);border:1px solid var(--br)}
+.np-row input{flex:1;background:transparent;border:none;color:var(--t);font-size:.8rem}
+.np-row input:focus{background:transparent;box-shadow:none}
+.np-del{color:var(--t3);cursor:pointer;padding:4px}
+.np-del:hover{color:var(--red)}
+.np-add{font-size:.75rem;color:var(--ac);cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:4px}
+.np-add:hover{opacity:.8}
+
 /* ── MODAL ── */
 .mbg{position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s;padding:14px}
 .mbg.on{opacity:1;pointer-events:all}
@@ -216,7 +226,7 @@ code{font-size:.77rem;background:var(--bg2);padding:1px 6px;border-radius:4px;bo
           <div class="ptitle">Profile <em>Settings</em></div>
           <button class="btn btn-save" id="save-profile"><i class="fa-solid fa-cloud-arrow-up"></i> Save to GitHub</button>
         </div>
-        <div class="notice ni"><i class="fa-solid fa-circle-info"></i> تغییرات مستقیماً روی GitHub ذخیره می‌شن و سایت در چند دقیقه آپدیت می‌شه.</div>
+        <div class="notice ni"><i class="fa-solid fa-circle-info"></i> تغییرات مستقیماً روی GitHub ذخیره می‌شن و سایت در چند ثانیه آپدیت می‌شه.</div>
         <div class="card">
           <div class="card-h">Personal Info</div>
           <div class="fgrid">
@@ -251,19 +261,13 @@ code{font-size:.77rem;background:var(--bg2);padding:1px 6px;border-radius:4px;bo
           </div>
         </div>
         <div class="card">
-          <div class="card-h">🎵 Now Playing in my head</div>
-          <div class="notice ni" style="margin-bottom:14px"><i class="fa-solid fa-circle-info"></i> این بخش پایین لیست آهنگ‌ها روی سایت نشون داده می‌شه — آهنگی که الان توی سرته رو بنویس.</div>
-          <div class="fgrid">
-            <div class="fld"><label>Track name</label><input id="np-track" placeholder="Holocene"/></div>
-            <div class="fld"><label>Artist</label><input id="np-artist" placeholder="Bon Iver"/></div>
-            <div class="fld" style="grid-column:span 2;flex-direction:row;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--br);border-radius:var(--r);padding:10px 14px">
-              <input type="checkbox" id="np-spin" style="width:16px;height:16px;accent-color:var(--ac);cursor:pointer"/>
-              <label for="np-spin" style="font-size:.82rem;color:var(--t2);cursor:pointer;text-transform:none;letter-spacing:0">وینیل بچرخه (spinning vinyl animation)</label>
-            </div>
-            <div class="fld s2" style="flex-direction:row;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--br);border-radius:var(--r);padding:10px 14px">
-              <input type="checkbox" id="np-show" style="width:16px;height:16px;accent-color:var(--ac);cursor:pointer"/>
-              <label for="np-show" style="font-size:.82rem;color:var(--t2);cursor:pointer;text-transform:none;letter-spacing:0">نشون بده روی سایت (اگه خالی بمونه مخفیه)</label>
-            </div>
+          <div class="card-h">🎵 Now Playing in my head (چند آهنگی)</div>
+          <div class="notice ni" style="margin-bottom:14px"><i class="fa-solid fa-circle-info"></i> آهنگ‌هایی که الان توی سرته رو اضافه کن. روی سایت خودکار چرخش می‌کنن.</div>
+          <div class="np-list" id="np-list"></div>
+          <div class="np-add" id="np-add-btn"><i class="fa-solid fa-plus"></i> Add song</div>
+          <div style="margin-top:12px;flex-direction:row;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--br);border-radius:var(--r);padding:10px 14px">
+            <input type="checkbox" id="np-spin" style="width:16px;height:16px;accent-color:var(--ac);cursor:pointer"/>
+            <label for="np-spin" style="font-size:.82rem;color:var(--t2);cursor:pointer;text-transform:none;letter-spacing:0">وینیل بچرخه (spinning vinyl animation)</label>
           </div>
         </div>
       </div>
@@ -541,13 +545,47 @@ function fillProfile(){
   set('s-email',ss.email); set('s-github',ss.github);
   set('s-insta',ss.instagram); set('s-tg',ss.telegram);
 
-  // Now Playing
-  const np = p.now_playing || {};
-  set('np-track',  np.track  || '');
-  set('np-artist', np.artist || '');
-  const spinEl = $('np-spin'), showEl = $('np-show');
-  if(spinEl) spinEl.checked = !!np.spinning;
-  if(showEl) showEl.checked = !!(np.track || np.artist);
+  // Now Playing List Logic
+  const npList = $('np-list');
+  npList.innerHTML = '';
+  let npData = [];
+  
+  // Support old single object or new array
+  if(Array.isArray(p.now_playing)){
+    npData = p.now_playing;
+  } else if (p.now_playing && (p.now_playing.track || p.now_playing.artist)) {
+    npData = [p.now_playing];
+  }
+
+  // Helper to create row
+  const createRow = (track='', artist='') => {
+    const div = document.createElement('div');
+    div.className = 'np-row';
+    div.innerHTML = `
+      <input type="text" placeholder="Track name" value="${esc(track)}" class="np-track-inp">
+      <input type="text" placeholder="Artist" value="${esc(artist)}" class="np-artist-inp">
+      <i class="fa-solid fa-trash np-del"></i>
+    `;
+    div.querySelector('.np-del').onclick = () => { div.remove(); };
+    return div;
+  };
+
+  if(npData.length === 0) {
+    npList.appendChild(createRow());
+  } else {
+    npData.forEach(item => {
+      npList.appendChild(createRow(item.track||'', item.artist||''));
+    });
+  }
+
+  const spinEl = $('np-spin');
+  if(spinEl) spinEl.checked = !!(npData.length && npData[0].spinning);
+
+  // Add button logic
+  $('np-add-btn').onclick = () => {
+    npList.appendChild(createRow());
+  };
+
   if(p.photo){
     const cdnUrl=CDN?CDN+'/'+p.photo:`https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}@${BRANCH}/${p.photo}`;
     $('up-photo-st').innerHTML=`<div class="upprev"><img src="${cdnUrl}" onerror="this.style.display='none'"/><span style="font-size:.72rem;color:var(--t2)">Current photo</span></div>`;
@@ -557,6 +595,18 @@ function fillProfile(){
 
 $('save-profile').onclick = async()=>{
   const g = id=>($(id)||{}).value||'';
+  
+  // Collect NP List
+  const npListArr = [];
+  document.querySelectorAll('#np-list .np-row').forEach(row => {
+    const tr = row.querySelector('.np-track-inp').value.trim();
+    const ar = row.querySelector('.np-artist-inp').value.trim();
+    if(tr || ar) {
+      npListArr.push({ track: tr, artist: ar, spinning: false }); // spinning handled globally
+    }
+  });
+  if(npListArr.length > 0) npListArr[0].spinning = !!$('np-spin')?.checked;
+
   $('save-profile').disabled=true;
   try{
     DATA.profile = {
@@ -565,11 +615,7 @@ $('save-profile').onclick = async()=>{
       mood:g('p-mood'), bio:g('p-bio'),
       about_p1:g('p-p1'), about_p2:g('p-p2'),
       photo: pendingFilePath.photo || DATA.profile?.photo || '',
-      now_playing: {
-        track:    g('np-track'),
-        artist:   g('np-artist'),
-        spinning: !!($('np-spin')?.checked),
-      },
+      now_playing: npListArr.length ? npListArr : null,
       social:{ email:g('s-email'), github:g('s-github'), instagram:g('s-insta'), telegram:g('s-tg') }
     };
     await saveData('Update profile');
@@ -720,8 +766,10 @@ $('mdel').onclick=async()=>{
   if(!confirm('حذف شود?')) return;
   DATA[mType].splice(mIdx,1);
   closeModal(); renderList(mType);
-  try{ await saveData('Delete from '+mType); showToast('حذف شد ✓'); }
-  catch(e){ showToast(e.message,true); }
+  try{
+    await saveData('Delete from '+mType);
+    showToast('حذف شد ✓');
+  }catch(e){ showToast(e.message,true); }
 };
 
 // ── JSON EDITOR ──
@@ -748,3 +796,4 @@ $('save-json').onclick=async()=>{
 </script>
 </body>
 </html>
+
