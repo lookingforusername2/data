@@ -1,0 +1,39 @@
+{
+  "profile": {
+    "name": "Your Name",
+    "city": "Your City",
+    "country": "Country",
+    "bio": "A curious person who loves music, slow mornings, and building things.",
+    "about_p1": "I'm a curious and creative person living somewhere between music, technology, and long afternoon walks. I find beauty in the details — a melody that feels like it was made just for you, or a book that changes how you see things.",
+    "about_p2": "By day I build things with code. By night I listen to music, read, take photos of whatever catches my eye, and write when something feels worth putting into words.",
+    "currently_reading": "A book you love",
+    "mood": "Peaceful & focused",
+    "languages": "Persian, English",
+    "photo": "",
+    "now_playing": {
+      "track": "Holocene",
+      "artist": "Bon Iver",
+      "spinning": true
+    },
+    "social": {
+      "email": "hello@example.com",
+      "github": "",
+      "instagram": "",
+      "telegram": ""
+    }
+  },
+  "music": [],
+  "gallery": [],
+  "posts": [
+    { "id": "1", "date": "June 2025", "title": "On listening to music alone at night", "excerpt": "There's something about 2am and headphones that makes every song feel like it was written just for you.", "url": "#" },
+    { "id": "2", "date": "April 2025", "title": "Why I stopped trying to optimize everything", "excerpt": "I used to think more efficiency meant more life. I'm not sure that's true anymore.", "url": "#" }
+  ],
+  "interests": [
+    { "icon": "🎵", "title": "Music",          "desc": "From Bon Iver to Beethoven. I listen to music the way others breathe — constantly and without thinking about it too much." },
+    { "icon": "📖", "title": "Reading",         "desc": "Books that change how you look at things. Fiction, philosophy, the occasional biography." },
+    { "icon": "💻", "title": "Building things", "desc": "Code is my medium. I love building tools that solve real problems — apps, utilities, experiments." },
+    { "icon": "📷", "title": "Photography",     "desc": "Mostly with my phone. I'm drawn to light, texture, and small moments that pass too quickly." },
+    { "icon": "🎮", "title": "Gaming",          "desc": "A Minecraft veteran. I appreciate games that reward curiosity and let you build on your own terms." },
+    { "icon": "🌿", "title": "Slow living",     "desc": "Long walks, quiet mornings, tea that's always too hot. The best moments arrive when you stop forcing them." }
+  ]
+}
