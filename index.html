@@ -44,6 +44,14 @@ img{max-width:100%;display:block}
 
 #prog{position:fixed;top:0;left:0;right:0;height:2px;background:var(--ac);transform-origin:left;transform:scaleX(0);z-index:9999;opacity:.7;transition:transform .05s linear}
 
+/* ── LIGHTBOX (Full screen image) ── */
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s var(--ease);backdrop-filter:blur(5px)}
+.lb.on{opacity:1;pointer-events:all}
+.lb img{max-width:95%;max-height:95vh;object-fit:contain;box-shadow:0 0 50px rgba(0,0,0,.6);border-radius:4px;transform:scale(.95);transition:transform .3s var(--ease)}
+.lb.on img{transform:scale(1)}
+.lb-close{position:absolute;top:20px;right:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;transition:background .2s}
+.lb-close:hover{background:rgba(255,255,255,.25)}
+
 /* ── NAV ── */
 .nav{position:fixed;top:0;left:0;right:0;height:var(--nh);z-index:900;transition:background .4s}
 .nav.sc{background:rgba(15,15,15,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--br)}
@@ -333,6 +341,12 @@ footer{padding:34px 0 26px;border-top:1px solid var(--br)}
 <div id="prog"></div>
 <audio id="aud" preload="none"></audio>
 
+<!-- LIGHTBOX -->
+<div class="lb" id="lb">
+  <button class="lb-close" onclick="document.getElementById('lb').classList.remove('on')"><i class="fa-solid fa-xmark"></i></button>
+  <img id="lb-img" src="" alt="Full view" onclick="event.stopPropagation()"/>
+</div>
+
 <nav class="nav" id="nav">
   <div class="wrap nav-in">
     <a href="#hero" class="nav-name" id="nn">Your Name</a>
@@ -605,7 +619,8 @@ function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 async function load(){
   if(!CDN){ render(null); return; }
   try{
-    const r=await fetch(CDN+'/data.json?_='+Math.floor(Date.now()/60000));
+    // Added cache: 'no-store' to force fresh data fetch
+    const r=await fetch(CDN+'/data.json?_='+Date.now(), { cache: 'no-store' });
     if(!r.ok) throw new Error();
     render(await r.json());
   }catch{
@@ -628,17 +643,53 @@ function render(d){
   $('ab-read').textContent=p.currently_reading||'—';
   $('ab-mood').textContent=p.mood||'—';
 
-  // Now Playing bar
-  const np = p.now_playing;
+  // Now Playing bar (New Logic: Supports Array rotation)
+  const npData = p.now_playing;
   const npBar = $('now-play-bar');
-  if(np && (np.track||np.artist)){
-    $('np-track').textContent  = np.track  || '—';
-    $('np-artist').textContent = np.artist || '—';
-    $('np-vinyl').classList.toggle('spin', !!np.spinning);
+  
+  // Normalize to array (handle old single object or new array)
+  let npList = [];
+  if (Array.isArray(npData)) {
+    npList = npData.filter(i => i.track || i.artist);
+  } else if (npData && (npData.track || npData.artist)) {
+    npList = [npData];
+  }
+
+  if (npList.length > 0) {
     npBar.style.display = 'flex';
+    let npIndex = 0;
+    const npTrack = $('np-track');
+    const npArtist = $('np-artist');
+    const npVinyl = $('np-vinyl');
+    
+    const updateNp = () => {
+      const current = npList[npIndex];
+      npTrack.textContent = current.track || '—';
+      npArtist.textContent = current.artist || '—';
+      // spinning animation if provided in the first item (or current item)
+      if (current.spinning) npVinyl.classList.add('spin');
+      else npVinyl.classList.remove('spin');
+      
+      // Fade animation
+      npTrack.style.opacity = 0; npArtist.style.opacity = 0;
+      setTimeout(() => { npTrack.style.opacity = 1; npArtist.style.opacity = 1; }, 50);
+    };
+
+    updateNp();
+    
+    if (npList.length > 1) {
+      setInterval(() => {
+        npTrack.style.opacity = 0; npArtist.style.opacity = 0;
+        setTimeout(() => {
+          npIndex = (npIndex + 1) % npList.length;
+          updateNp();
+        }, 400); // wait for fade out
+      }, 6000); // switch every 6 seconds
+    }
   } else {
     npBar.style.display = 'none';
   }
+
   if(p.photo){const ph=$('ab-photo');ph.innerHTML=`<img src="${CDN+'/'+p.photo}" alt="${esc(name)}" loading="lazy" onerror="this.remove()"/>`;}
 
   $('ab-links').innerHTML=[
@@ -663,7 +714,7 @@ function render(d){
 
   const gal=(d||{}).gallery||[];
   $('ggrid').innerHTML=gal.length
-    ?gal.map(g=>`<div class="gi" style="background:${esc(g.bg||'#1a1a1a')}">${g.file?`<img src="${CDN+'/'+esc(g.file)}" alt="${esc(g.caption||'')}" loading="lazy" onerror="this.remove()"/>`:esc(g.emoji||'📷')}<div class="gi-cap">${esc(g.caption||'')}</div></div>`).join('')
+    ?gal.map(g=>`<div class="gi" style="background:${esc(g.bg||'#1a1a1a')}">${g.file?`<img src="${CDN+'/'+esc(g.file)}" alt="${esc(g.caption||'')}" loading="lazy" onclick="openLightbox('${CDN+'/'+esc(g.file)}')" onerror="this.remove()"/>`:esc(g.emoji||'📷')}<div class="gi-cap">${esc(g.caption||'')}</div></div>`).join('')
     :'<div style="grid-column:span 12;text-align:center;color:var(--t3);padding:28px;font-size:.88rem">No photos yet</div>';
 
   $('igrid').innerHTML=((d||{}).interests||[]).map(i=>`<div class="int-card rv"><span class="int-icon">${esc(i.icon||'✨')}</span><div class="int-title">${esc(i.title||'')}</div><p class="int-desc">${esc(i.desc||'')}</p></div>`).join('');
@@ -672,6 +723,14 @@ function render(d){
     ||'<div style="text-align:center;color:var(--t3);padding:28px;font-size:.88rem">No posts yet</div>';
 
   document.querySelectorAll('.rv:not(.in)').forEach(el=>ro.observe(el));
+}
+
+/* ── LIGHTBOX ── */
+window.openLightbox = function(src){
+  const lb = $('lb');
+  const img = $('lb-img');
+  img.src = src;
+  lb.classList.add('on');
 }
 
 /* ── Music Player ── */
